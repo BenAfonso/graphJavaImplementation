@@ -8,7 +8,7 @@ import graph.*;
 * @author: AFONSO Benjamin and TERRIEN James
 */
 
-public class MonGraph implements Graph {
+public class GraphImplement implements Graph {
   private Vertex[][] graphVertexes;
 
 
