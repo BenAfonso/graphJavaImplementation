@@ -8,6 +8,7 @@ package graph;
 public class Test {
 
   //TODO
+	@SuppressWarnings("null")
 	public static void main(String[] args) {
     int fail = 0;
     int success = 0;
@@ -15,7 +16,7 @@ public class Test {
     Graph graph = new GraphImplement();
 
     // Population Graph
-    double[] values = null;
+    double[] values = new double[2];
 
     values[0] = 1.0;
     values[1] = 1.0;
@@ -107,7 +108,7 @@ public class Test {
     }
 
     // Remove test of All Vertex
-    Vertex[] vertexes = null;
+    Vertex[] vertexes = new Vertex[2];
     vertexes[0] = v1;
     vertexes[1] = v2;
     if (graph.removeAllVertices(vertexes)){
@@ -118,7 +119,7 @@ public class Test {
       fail++;
     }
 
-    Edge[] edges = null;
+    Edge[] edges = new Edge[2];
     edges[0] = e1;
     edges[1] = e2;
     // Remove test of All Edges

@@ -9,9 +9,13 @@ import graph.*;
 */
 
 public class GraphImplement implements Graph {
+
+
   private Vertex[][] graphVertexes;
 
-
+  public GraphImplement() {
+	  this.graphVertexes = new Vertex[10][10];
+  }
   /**
   *
   *
@@ -26,10 +30,13 @@ public class GraphImplement implements Graph {
   *
   */
   public boolean addVertex(Vertex v){
-    Vertex[] temp = null;
+    Vertex[] temp = new Vertex[1];
     temp[0] = v;
-    this.graphVertexes[this.graphVertexes.length] = temp;
-
+    try {
+    this.graphVertexes[0] = temp;
+    } catch (Exception e) {
+    	return false;
+    }
     return true;
   }
 
@@ -40,10 +47,15 @@ public class GraphImplement implements Graph {
   public boolean addEdge(Edge e){
     if (isDirected(e)){
       Vertex[] temp;
-      //temp[0] = e.getOrigin();
-      //temp[1] = e.getEnd();
+      /*temp[0] = e.getOrigin();
+      //temp[1] = e.getEnd();*/
       temp = e.getEnds();
-      this.graphVertexes[this.graphVertexes.length] = temp;
+      try{
+    	  this.graphVertexes[this.graphVertexes.length-1] = temp;
+      }catch (Exception e2) {
+    	  return false;
+      }
+
     }
     return true;
   }
@@ -76,11 +88,12 @@ public class GraphImplement implements Graph {
   *   implementation of: vertexIsInGraph
   *
   */
-  public boolean vertexIsInGraph(Vertex v){
+  @SuppressWarnings("null")
+public boolean vertexIsInGraph(Vertex v){
     int i = 0;
-    Vertex[] temp = null;
+    Vertex[] temp = new Vertex[1];
     temp[0] = v;
-    while (temp != this.graphVertexes[i] && i < this.graphVertexes.length){
+    while (temp != this.graphVertexes[i] && i < this.graphVertexes.length-1){
       i++;
     }
     return (i != this.graphVertexes.length);
@@ -100,7 +113,7 @@ public class GraphImplement implements Graph {
       temp[1] = e.getEnd();
     }
     */
-    while (temp != this.graphVertexes[i] && i < this.graphVertexes.length){
+    while (temp != this.graphVertexes[i] && i < this.graphVertexes.length-1){
       i++;
     }
     return (i != this.graphVertexes.length);
@@ -111,7 +124,6 @@ public class GraphImplement implements Graph {
   *   The edge has to exist ?
   */
   public Edge getEdge(Vertex a, Vertex b){
-    int i = 0;
     if (vertexIsInGraph(a) && vertexIsInGraph(b)){
       return new UndirectedEdge(a,b);
     }
@@ -123,9 +135,14 @@ public class GraphImplement implements Graph {
   *   The edge has to exist ?
   */
   public boolean removeAllEdges(Edge[] edges){
-    for (Edge edge : edges){
-      removeEdge(edge);
-    }
+	try{
+	    for (Edge edge : edges){
+	        removeEdge(edge);
+	      }
+	}catch (Exception e4){
+		return false;
+	}
+
     return true;
   }
 
@@ -134,8 +151,12 @@ public class GraphImplement implements Graph {
   *   The edge has to exist ?
   */
   public boolean removeAllVertices(Vertex[] vertexes){
-    for (Vertex vertex : vertexes){
-      removeVertex(vertex);
+    try{
+		for (Vertex vertex : vertexes){
+	      removeVertex(vertex);
+	    }
+    }catch(Exception e3){
+    	return false;
     }
     return true;
   }
@@ -143,40 +164,66 @@ public class GraphImplement implements Graph {
   //TODO**************
 
   public boolean removeEdge(Edge edge){
-    return false;
+	try {
+		int i=getEdgePosition(edge);
+		for (int j = i; j < this.graphVertexes.length-2; j++){
+			this.graphVertexes[j] = this.graphVertexes[j+1];
+		}
+	} catch (Exception e5) {
+		return false;
+	}
+
+    return true;
   }
 
   public boolean removeVertex(Vertex vertex){
-    return false;
+		try {
+			int i=getVertexPosition(vertex);
+			for (int j = i; j < this.graphVertexes.length-2; j++){
+				this.graphVertexes[j] = this.graphVertexes[j+1];
+			}
+		} catch (Exception e5) {
+			return false;
+		}
+
+	    return true;
   }
 
   public Edge[] adjascentEdges(Vertex vertex){
     return null;
   }
 
-  //WIP ************
-  // [0,(0,1),1]
-  public int getVertexPosition(Vertex vertex){
+
+  /*
+   *
+   *
+   *  Privates functions
+   *
+   *
+   */
+
+
+  private int getVertexPosition(Vertex vertex){
       int i = 0;
-      Vertex[] temp = null;
+      Vertex[] temp = new Vertex[1];
       temp[0] = vertex;
-      while (temp != this.graphVertexes[i] && i < this.graphVertexes.length){
+      while (temp != this.graphVertexes[i] && i < this.graphVertexes.length-1){
         i++;
       }
       return i;
   }
 
-  public int getEdgePosition(Edge edge){
+  private int getEdgePosition(Edge edge){
     int i = 0;
     Vertex[] temp = null;
     temp = edge.getEnds();
-    while (temp != this.graphVertexes[i] && i < this.graphVertexes.length){
+    while (temp != this.graphVertexes[i] && i < this.graphVertexes.length-1){
       i++;
     }
     return i;
   }
 
-  public Edge getNextEdge(Vertex vertex){
+  private Edge getNextEdge(Vertex vertex){
     /*if (!(vertexIsInGraph(vertex))){
       throw new Exception();
     }*/
@@ -188,7 +235,7 @@ public class GraphImplement implements Graph {
 
   }
 
-  public Edge getPreviousEdge(Vertex vertex){
+  private Edge getPreviousEdge(Vertex vertex){
     /*
     if (!(vertexIsInGraph(vertex))){
       throw new Exception();
@@ -201,7 +248,7 @@ public class GraphImplement implements Graph {
 
   }
 
-  public Vertex getNextVertex(Edge edge){
+  private Vertex getNextVertex(Edge edge){
     /*if (!(edgeIsInGraph(edge))){
       throw new Exception();
     }*/
@@ -210,7 +257,7 @@ public class GraphImplement implements Graph {
 
   }
 
-  public Vertex getPreviousVertex(Edge edge){
+  private Vertex getPreviousVertex(Edge edge){
     /*if (!(edgeIsInGraph(edge))){
       throw new Exception();
     }*/
