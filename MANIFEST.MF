@@ -1,0 +1,3 @@
+Main-Class: graph.Test
+Class-Path: jar/graph.jar bin/
+

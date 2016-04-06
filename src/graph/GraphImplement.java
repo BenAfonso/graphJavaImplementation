@@ -1,5 +1,4 @@
 package graph;
-import graph.*;
 
 /**
 * Implementation of interface graph
@@ -11,13 +10,17 @@ import graph.*;
 public class GraphImplement implements Graph {
 
 
-  private Vertex[][] graphVertexes;
-
+  private Vertex[] vertexes;
+  private Edge[][] edges;
+  private int ordre = 0;
+  
   public GraphImplement() {
-	  this.graphVertexes = new Vertex[10][10];
+	  this.ordre = 0;
+	  this.vertexes = new Vertex[100];
+	  this.edges = new Edge[100][100];
   }
   /**
-  *
+  *		Implementation of isAdjacent function
   *
   */
   public boolean isAdjacent(Edge e1, Edge e2){
@@ -26,58 +29,97 @@ public class GraphImplement implements Graph {
 
 
   /**
-  *
-  *
+  * 	Implementation of addVertex function
+  *	
   */
   public boolean addVertex(Vertex v){
-    Vertex[] temp = new Vertex[1];
-    temp[0] = v;
-    try {
-    this.graphVertexes[0] = temp;
-    } catch (Exception e) {
-    	return false;
-    }
-    return true;
+	  
+	  // Gerer le cas de dépassement
+	  try {
+		  this.vertexes[ordre] = v;
+		  this.ordre++;
+	  }
+	  catch (Exception overflow) {
+		  return false;
+	  }
+	  return true;
+	  
   }
 
   /**
-  *
+  *		Implementation of addEdge
   *
   */
   public boolean addEdge(Edge e){
-    if (isDirected(e)){
-      Vertex[] temp;
-      /*temp[0] = e.getOrigin();
-      //temp[1] = e.getEnd();*/
-      temp = e.getEnds();
-      try{
-    	  this.graphVertexes[this.graphVertexes.length-1] = temp;
-      }catch (Exception e2) {
-    	  return false;
-      }
+	  
+	  
+	  try{
+		  int i = getVertexPosition(e.getEnds()[0]);
+		  int j = getVertexPosition(e.getEnds()[1]);
+		  // Vertex 1 doesn't exist
+		  if (i == -1){
+			  this.addVertex(e.getEnds()[0]);
+		  }
+		  // Vertex 2 doesn't exist
+		  if (j == -1){
+			  this.addVertex(e.getEnds()[1]);
+		  }
+		  
+		  // Add the edge.
+		  	// If the edge is directed
+		  if (isDirected(e)){
+			  int p1 = getVertexPosition(((DirectedEdge) e).getOrigin());
+			  int p2 = getVertexPosition(((DirectedEdge) e).getEnd());
+			  System.out.println(i+" "+j);
+			  System.out.println(p1+" "+p2);
+			  this.edges[p1][p2] = e;
 
-    }
-    return true;
+		  }
+		  // The edge is not directed
+		  else
+		  {
+			  this.edges[i][j] = e;
+			  this.edges[j][i] = e;
+
+		  }
+
+		  
+	  }catch (Exception UnknownException){
+		  return false;
+	  }
+
+	  return true;
   }
 
   /**
   *
+  * Implementation of getAllEdges
   *
   */
   public Edge[] getAllEdges(){
-    return null;
+	int k = 0;
+	Edge[] res = new Edge[this.ordre*this.ordre];
+    for (int i = 0; i < this.ordre; i++){
+    	for (int j = 0; j < this.ordre; j++){
+    		res[k] = this.edges[i][j];
+    		k++;
+    	}
+    }
+    return res;
   }
 
   /**
   *
-  *
+  *	Implementation of getAllVertices
+  * 
   */
   public Vertex[] getAllVertices(){
-    return null;
+    return this.vertexes;
   }
 
   /**
   *
+  * Implementation of isDirected
   *
   */
   public boolean isDirected(Edge e){
@@ -88,15 +130,14 @@ public class GraphImplement implements Graph {
   *   implementation of: vertexIsInGraph
   *
   */
-  @SuppressWarnings("null")
+
 public boolean vertexIsInGraph(Vertex v){
     int i = 0;
-    Vertex[] temp = new Vertex[1];
-    temp[0] = v;
-    while (temp != this.graphVertexes[i] && i < this.graphVertexes.length-1){
-      i++;
+    while (v != this.vertexes[i] && i<this.ordre){
+    	i++;
     }
-    return (i != this.graphVertexes.length);
+    // v=this.vertexes[i] ou i=this.ordre
+    return (v==this.vertexes[i]);
   }
 
   /**
@@ -104,19 +145,13 @@ public boolean vertexIsInGraph(Vertex v){
   *
   */
   public boolean edgeIsInGraph(Edge e){
-    int i = 0;
-    Vertex[] temp;
-    temp = e.getEnds();
-    /*
-    if (isDirected(e)){
-      temp[0] = e.getOrigin();
-      temp[1] = e.getEnd();
+	int p1 = getVertexPosition(e.getEnds()[0]);
+	int p2 = getVertexPosition(e.getEnds()[1]);
+	System.out.println(p1+" "+p2);
+    if (p1 != -1 && p2 != -1){
+    	return (this.edges[p2][p1] != null || this.edges[p1][p2] != null);
     }
-    */
-    while (temp != this.graphVertexes[i] && i < this.graphVertexes.length-1){
-      i++;
-    }
-    return (i != this.graphVertexes.length);
+    return false;
   }
 
   /**
@@ -124,10 +159,12 @@ public boolean vertexIsInGraph(Vertex v){
   *   The edge has to exist ?
   */
   public Edge getEdge(Vertex a, Vertex b){
-    if (vertexIsInGraph(a) && vertexIsInGraph(b)){
-      return new UndirectedEdge(a,b);
-    }
-    return null;
+	  int p1 = getVertexPosition(a);
+		int p2 = getVertexPosition(b);
+	    if (p1 != -1 && p2 != -1){
+	    	return (this.edges[p1][p2]);
+	    }
+	    return null;
   }
 
   /**
@@ -136,14 +173,14 @@ public boolean vertexIsInGraph(Vertex v){
   */
   public boolean removeAllEdges(Edge[] edges){
 	try{
-	    for (Edge edge : edges){
-	        removeEdge(edge);
-	      }
+		for (Edge edge : edges){
+			removeEdge(edge);
+		}
+
 	}catch (Exception e4){
 		return false;
 	}
-
-    return true;
+	return true;
   }
 
   /**
@@ -164,33 +201,51 @@ public boolean vertexIsInGraph(Vertex v){
   //TODO**************
 
   public boolean removeEdge(Edge edge){
-	try {
-		int i=getEdgePosition(edge);
-		for (int j = i; j < this.graphVertexes.length-2; j++){
-			this.graphVertexes[j] = this.graphVertexes[j+1];
-		}
-	} catch (Exception e5) {
-		return false;
-	}
-
-    return true;
+	  int p1 = getVertexPosition(edge.getEnds()[0]);
+		int p2 = getVertexPosition(edge.getEnds()[1]);
+	    if (p1 != -1 && p2 != -1){
+	    	this.edges[p1][p2] = null;
+	    	return true;
+	    }
+	    return false;
   }
 
+  /**
+   * Implementation of removeVertex(vertex)
+   * @param vertex
+   * @return boolean
+   */
   public boolean removeVertex(Vertex vertex){
-		try {
-			int i=getVertexPosition(vertex);
-			for (int j = i; j < this.graphVertexes.length-2; j++){
-				this.graphVertexes[j] = this.graphVertexes[j+1];
-			}
-		} catch (Exception e5) {
-			return false;
-		}
+	  if (vertexIsInGraph(vertex)){
+		  try{
+			  for (int i = 0;i<this.ordre;i++){
+				  this.edges[getVertexPosition(vertex)][i] = null;
+				  this.edges[i][getVertexPosition(vertex)] = null;
+			  }
+			  this.vertexes[getVertexPosition(vertex)] = null;
+		  }
+		  
+		  catch (Exception e6){
+			  
+			  return false;
+		  }
+		  return true;
+	  }
 
-	    return true;
+	  return false;
+	  
   }
 
   public Edge[] adjascentEdges(Vertex vertex){
-    return null;
+    int pos = getVertexPosition(vertex);
+    Edge[] res = new Edge[this.ordre * this.ordre];
+    int k = 0;
+    for (int i = 0; i < this.ordre; i++){
+    	res[k] = this.edges[pos][i];
+    	res[k+1] = this.edges[i][pos];
+    	k = k+2;
+    }
+    return res;
   }
 
 
@@ -205,66 +260,18 @@ public boolean vertexIsInGraph(Vertex v){
 
   private int getVertexPosition(Vertex vertex){
       int i = 0;
-      Vertex[] temp = new Vertex[1];
-      temp[0] = vertex;
-      while (temp != this.graphVertexes[i] && i < this.graphVertexes.length-1){
+      while (vertex != this.vertexes[i] && i < this.vertexes.length-1){
         i++;
       }
-      return i;
+      // i = dernière case OU vertex = vertex[i]
+      if (vertex == this.vertexes[i]){
+    	  return i;
+      }
+      return -1;
   }
 
-  private int getEdgePosition(Edge edge){
-    int i = 0;
-    Vertex[] temp = null;
-    temp = edge.getEnds();
-    while (temp != this.graphVertexes[i] && i < this.graphVertexes.length-1){
-      i++;
-    }
-    return i;
-  }
 
-  private Edge getNextEdge(Vertex vertex){
-    /*if (!(vertexIsInGraph(vertex))){
-      throw new Exception();
-    }*/
-    int i = getVertexPosition(vertex);
 
-    // Test if Undirected of Directed ......
-    UndirectedEdge res = new UndirectedEdge(this.graphVertexes[i][0],this.graphVertexes[i][1]);
-    return res;
-
-  }
-
-  private Edge getPreviousEdge(Vertex vertex){
-    /*
-    if (!(vertexIsInGraph(vertex))){
-      throw new Exception();
-    }*/
-    int i = getVertexPosition(vertex)-2;
-
-    // Test if Undirected of Directed ......
-    UndirectedEdge res = new UndirectedEdge(this.graphVertexes[i][0],this.graphVertexes[i][1]);
-    return res;
-
-  }
-
-  private Vertex getNextVertex(Edge edge){
-    /*if (!(edgeIsInGraph(edge))){
-      throw new Exception();
-    }*/
-    int i = getEdgePosition(edge);
-    return this.graphVertexes[i][0];
-
-  }
-
-  private Vertex getPreviousVertex(Edge edge){
-    /*if (!(edgeIsInGraph(edge))){
-      throw new Exception();
-    }*/
-    int i = getEdgePosition(edge)-2;
-    return this.graphVertexes[i][0];
-
-  }
 
 
 }

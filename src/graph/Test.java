@@ -8,7 +8,6 @@ package graph;
 public class Test {
 
   //TODO
-	@SuppressWarnings("null")
 	public static void main(String[] args) {
     int fail = 0;
     int success = 0;
@@ -38,7 +37,7 @@ public class Test {
     Edge e1 = new DirectedEdge(v1,v2);
     Edge e2 = new DirectedEdge(v2,v3);
     Edge e3 = new UndirectedEdge(v3,v4);
-    Edge e4 = new UndirectedEdge(v3,v4);
+    Edge e4 = new UndirectedEdge(v5,v4);
 
     graph.addVertex(v1);
     graph.addVertex(v2);
@@ -89,14 +88,7 @@ public class Test {
     System.out.println("All vertexes: ");
     System.out.println(graph.getAllVertices());
 
-    // Remove test of Vertex
-    if (graph.removeVertex(v1)){
-      System.out.println("Remove vertex test: SUCCESS");
-      success++;
-    }else{
-      System.out.println("Remove vertex test: FAILED");
-      fail++;
-    }
+
 
     // Remove test of Vertex
     if (graph.removeEdge(e1)){
@@ -104,6 +96,15 @@ public class Test {
       success++;
     }else{
       System.out.println("Remove edge test: FAILED");
+      fail++;
+    }
+    
+    // Remove test of Vertex
+    if (graph.removeVertex(v1)){
+      System.out.println("Remove vertex test: SUCCESS");
+      success++;
+    }else{
+      System.out.println("Remove vertex test: FAILED");
       fail++;
     }
 
